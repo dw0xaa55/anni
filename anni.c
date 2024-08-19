@@ -19,8 +19,15 @@ int main(int argc, char** argv){
   (void) argv;
 
   Trainingset ts;
+  NeuralNetwork nn;
+  size_t topology[3] = { 2,2,1 };
+
   load_training_file(&ts,"trainingfile.ts");
   print_trainingset(ts);
+  initialize_model(&nn, topology, GET_CONTAINER_SIZE(topology));
+  print_model(nn);
+
+  free_model(nn);
   free_trainingset(ts);
   
   return 0;
