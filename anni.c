@@ -1,15 +1,16 @@
 /* DESCRIPTION: Artificial Neural Network Intelligence   */
 /* AUTHOR     : C. Huffenbach                            */
-/* VERSION    : 0.1                                      */
+/* VERSION    : 0.2                                      */
 /* DATE       : 08/2024                                  */
 
 /* TODO:                                                 */
 /*   - [X] think of trainingset architecture             */
+/*   - [X] create Network struct                         */
 /*   - [X] load trainingsets from file                   */
-/*   - [ ] option to print networks                      */
+/*   - [X] option to print networks                      */
 /*   - [ ] save trained network to file                  */
 /*   - [ ] option to load networks from file             */
-/*   - [ ] create Network struct                         */
+
 
 #define ANNI_IMPLEMENTATION
 #include "anni.h"
