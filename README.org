@@ -1,2 +1,115 @@
 # anni
-Artificial Neural Network Intelligence
+* ANNI - Artificial Neural Network Intelligence
+The purpose of this project is to get a better understanding on how artificial neural networks operate since programs like e.g. stable diffusion or starnet++ sparked my interest in the topic.  In addition to this I see it as kind of a challenge to implement it by myself after watching tons of videos and tutorials online and reading equally as many papers about machine learning. So I am not really trying to create the best performing or even the most usable AI framework, though I believe it would be pretty fun experimenting with some usecases if I get it to work properly. That being said, in the end it is nothing more than a recreational programming exercise for me and maybe for others who want to play around with this thing. I used C for this project, because it seemed fun to me, though I wouldn't be disinclined porting it to Common-LISP if I get it to work here properly. 
+
+* Downloading and Building
+To build this project there aren't any dependencies other than libc ...duh... A Makefile is included. So just type the following:
+#+BEGIN_SRC bash
+  $ git clone https://github.com/dw0xaa55/anni
+  $ cd anni/
+  ### To build:
+  $ make
+  ### To run:
+  $ make run
+#+END_SRC
+
+* Usage
+I implemented this with the STB-style header-only library philosophy in mind because I like the minimalist and easy to include approach, so everything needed is in one header file including the code for all functions. The anni.c file can be seen as an example So to include anni.h with access to all implementations use the following:
+
+#+BEGIN_SRC c
+  #define ANNI_IMPLEMENTATION
+  #include "/path/to/anni.h"
+#+END_SRC
+
+As for the setup of the neural net I created the structs *Trainingset*, *DataContainer* and *NeuralNetwork* which should be pretty self explanatory. I will list the structs here, to quickly be able to look up the member variables.
+
+*Trainingset*
+Its purpose is to hold the training data for a neural net. The data pointer is dynamically allocated and should be freed if not used any longer. (see free functions later on in this document)
+#+BEGIN_SRC c
+  // Trainingset
+  typedef struct {
+    size_t input_size;
+    size_t output_size;
+    size_t samples;
+    size_t container_size;
+    size_t stride;
+    float* data;
+  } Trainingset;
+#+END_SRC
+*DataContainer*
+This struct is intended to hold stuff like inputs or outputs either from a trainingset or manual input. Also the data pointer needs to be freed after its usage.
+#+BEGIN_SRC c
+  // DataContainer
+  typedef struct {
+    size_t size;
+    size_t stride;
+    size_t samples;
+    float* data;
+  } DataContainer;
+#+END_SRC
+*NeuralNetwork*
+Here everything is stored concerning the actual neural network and its architecture from topology to all the layers which are stored in dynamically allocated arrays. Although it seems to be good practice to free the neural net after its usage has expired, I guess it's not really necessary since it should be in use until the program exits. Anyhow, I added a cleanup function, if you want it.
+#+BEGIN_SRC c
+  // NeuralNetwork
+  typedef struct {
+    size_t  topology_size;
+    size_t  weights_size;
+    size_t  bias_size;
+    size_t  neurons_size;
+    size_t* topology;
+    float*  weights;
+    float*  bias;
+    float*  neurons;
+  } NeuralNetwork;
+#+END_SRC
+
+*Functions:*
+At the risk of having too long function and argument names, I decided to go this way, for the sake of the descriptive names being a documentation by themselves and helping understand it faster. And since most editors should have some kind of auto completion anyway, it ain't that bad at least from my perspective.
+#+BEGIN_SRC c
+  void  load_training_file(Trainingset* trainingset, const char* filename);              // training files are described in depth below
+  void  print_trainingset(Trainingset trainingset);                                      // useful for debugging 
+  void  free_trainingset(Trainingset trainingset);                                       // actually only frees trainingset.data
+  void  get_inputs_from_trainingset(DataContainer* container, Trainingset trainingset);  // copies input from trainingset to container
+                                                                                         // for use with the feed_forward function
+  void  get_outputs_from_trainingset(DataContainer* container, Trainingset trainingset); // copies output from trainingset to container
+  void  free_container(DataContainer container);                                         // also only frees container.data
+  void  print_container(DataContainer container);                                        // useful for debugging
+  void  initialize_model(NeuralNetwork* model, size_t* topology, size_t topology_size);  // allocates memory for weights, biases and
+                                                                                         // neurons, and generates their respective
+                                                                                         // sizes from the given topology. The Topology
+                                                                                         // and its size should be a size_t array
+  void  print_model(NeuralNetwork model);                                                // useful for debugging and saving model into
+                                                                                         // a file with ./anny >> networkfile, though a
+                                                                                         // proper write-to-file function is planned
+  void  free_model(NeuralNetwork model);                                                 // do with it what you will
+  float randomize(float range_min, float range_max);                                     // returns random value in specified range
+  float sigmoid(float x);                                                                // sigmoid activation function for neurons
+  void  feed_forward(NeuralNetwork* model, DataContainer inputs);                        // calculates the neuron values 
+#+END_SRC
+
+*Trainingset File Architecture*
+You can create training set files to be loaded inside the program for easier training data management. I haven't tested it yet, but it seemed to be a good idea to have a feature like this for more complex training data later on. I suffixed my training files with ".ts" for it seemed rather fitting regarding its purpose, although ".txt" or whatever else you might prefer is fine, too, as long as it is formatted as a plain text file.
+
+*Example:*
+#+BEGIN_SRC
+  # Trainingset for XOR
+
+  input 2
+  output 1
+  samples 4
+
+  data
+  0,0,0,
+  0,1,1,
+  1,0,1,
+  1,1,0,
+#+END_SRC
+
+Lines beginning with "*#*" are comments, "*input"* followed by a blank space and an integer declares the number of input values per sample the network is being trained for. "*output*"  does the same thing for the outputs and "*samples*" sets how many training examples there are. Newlines weren't given any attention in the parser, thus should be ignored by it. The "*data*" keyword must come last in the file and stands by itself in one line followed by the data samples in subsequent lines. The data samples should be separated by commas and should not contain spaces, since the parser expects float values (thus decimal points would be allowed). One sample is partitioned in inputs and outputs in this succession without any other separations than the comma mentioned above.
+
+* Project TODO:
+** [ ] implement all WIP functions
+** [ ] implement proper back-propagation using gradient descent
+
+* Disclaimer
+I am a hobbyist programmer who likes playing around with programming languages and other nerdy stuff in my free time, so do not expect either elegant or efficient code. Also there may be bugs and maybe some swear words here and there (due to their unique semantic appearance in contrast to programming language terminology I occasionally use them to jump between code passages via search function, if the code blocks are far apart from each other :>). ~Happy Hacking
