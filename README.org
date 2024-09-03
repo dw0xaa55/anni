@@ -89,7 +89,7 @@ At the risk of having too long function and argument names, I decided to go this
   float randomize(float range_min, float range_max);                                     // returns random value in specified range
   float sigmoid(float x);                                                                // sigmoid activation function for neurons
   void  feed_forward(NeuralNetwork* model, DataContainer inputs);                        // calculates the neuron values
-  float mean_square_error(NeuralNetwork model, Trainingset trainingset);                 // cost function for output evaluation
+  float mean_square_error(NeuralNetwork model, DataContainer inputs, DataContainer outputs); // cost function for output evaluation
 #+END_SRC
 
 *Trainingset File Architecture*
