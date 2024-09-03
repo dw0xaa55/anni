@@ -1,6 +1,6 @@
 /* DESCRIPTION: Artificial Neural Network Intelligence   */
 /* AUTHOR     : C. Huffenbach                            */
-/* VERSION    : 0.3                                      */
+/* VERSION    : 0.4                                      */
 /* DATE       : 08/2024                                  */
 
 /* TODO:                                                 */
@@ -9,7 +9,7 @@
 /*   - [X] load trainingsets from file                   */
 /*   - [X] option to print networks                      */
 /*   - [X] implement feed_forward                        */
-/*   - [ ] implement mean_square_error                   */
+/*   - [X] implement mean_square_error                   */
 /*   - [ ] implement finite_difference                   */
 /*   - [ ] save trained network to file                  */
 /*   - [ ] option to load trained networks from file     */
@@ -27,7 +27,7 @@ int main(int argc, char** argv){
   NeuralNetwork nn;
   DataContainer inputs;
   DataContainer outputs;
-  size_t topology[] = { 2,2,1 };
+  size_t topology[] = { 2,2,1};
 
   load_training_file(&ts,"trainingfile.ts");
   print_trainingset(ts);
@@ -40,10 +40,14 @@ int main(int argc, char** argv){
   /* print_container(outputs); */
   printf("-------------------------\n");
   printf("feed forward debug output:\n");
-  nn.neurons[0] = inputs.data[2];
-  nn.neurons[1] = inputs.data[3];
-  feed_forward(&nn);
-  print_model(nn);
+
+  /* nn.neurons[0] = inputs.data[2]; */
+  /* nn.neurons[1] = inputs.data[3]; */
+  /* feed_forward(&nn); */
+  /* print_model(nn); */
+
+  printf("error: %f\n", mean_square_error(nn, inputs, outputs));
+
 
   // clean up
   free_container(inputs);

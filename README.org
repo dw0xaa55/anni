@@ -24,6 +24,7 @@ I implemented this with the STB-style header-only library philosophy in mind bec
 As for the setup of the neural net I created the structs *Trainingset*, *DataContainer* and *NeuralNetwork* which should be pretty self explanatory. I will list the structs here, to quickly be able to look up the member variables.
 
 *Trainingset*
+
 Its purpose is to hold the training data for a neural net. The data pointer is dynamically allocated and should be freed if not used any longer. (see free functions later on in this document)
 #+BEGIN_SRC c
   // Trainingset
@@ -37,6 +38,7 @@ Its purpose is to hold the training data for a neural net. The data pointer is d
   } Trainingset;
 #+END_SRC
 *DataContainer*
+
 This struct is intended to hold stuff like inputs or outputs either from a trainingset or manual input. Also the data pointer needs to be freed after its usage.
 #+BEGIN_SRC c
   // DataContainer
@@ -48,6 +50,7 @@ This struct is intended to hold stuff like inputs or outputs either from a train
   } DataContainer;
 #+END_SRC
 *NeuralNetwork*
+
 Here everything is stored concerning the actual neural network and its architecture from topology to all the layers which are stored in dynamically allocated arrays. Although it seems to be good practice to free the neural net after its usage has expired, I guess it's not really necessary since it should be in use until the program exits. Anyhow, I added a cleanup function, if you want it.
 #+BEGIN_SRC c
   // NeuralNetwork
@@ -64,6 +67,7 @@ Here everything is stored concerning the actual neural network and its architect
 #+END_SRC
 
 *Functions:*
+
 At the risk of having too long function and argument names, I decided to go this way, for the sake of the descriptive names being a documentation by themselves and helping understand it faster. And since most editors should have some kind of auto completion anyway, it ain't that bad at least from my perspective.
 #+BEGIN_SRC c
   void  load_training_file(Trainingset* trainingset, const char* filename);              // training files are described in depth below
@@ -84,10 +88,12 @@ At the risk of having too long function and argument names, I decided to go this
   void  free_model(NeuralNetwork model);                                                 // do with it what you will
   float randomize(float range_min, float range_max);                                     // returns random value in specified range
   float sigmoid(float x);                                                                // sigmoid activation function for neurons
-  void  feed_forward(NeuralNetwork* model, DataContainer inputs);                        // calculates the neuron values 
+  void  feed_forward(NeuralNetwork* model, DataContainer inputs);                        // calculates the neuron values
+  float mean_square_error(NeuralNetwork model, Trainingset trainingset);                 // cost function for output evaluation
 #+END_SRC
 
 *Trainingset File Architecture*
+
 You can create training set files to be loaded inside the program for easier training data management. I haven't tested it yet, but it seemed to be a good idea to have a feature like this for more complex training data later on. I suffixed my training files with ".ts" for it seemed rather fitting regarding its purpose, although ".txt" or whatever else you might prefer is fine, too, as long as it is formatted as a plain text file.
 
 *Example:*
@@ -108,8 +114,8 @@ You can create training set files to be loaded inside the program for easier tra
 Lines beginning with "*#*" are comments, "*input"* followed by a blank space and an integer declares the number of input values per sample the network is being trained for. "*output*"  does the same thing for the outputs and "*samples*" sets how many training examples there are. Newlines weren't given any attention in the parser, thus should be ignored by it. The "*data*" keyword must come last in the file and stands by itself in one line followed by the data samples in subsequent lines. The data samples should be separated by commas and should not contain spaces, since the parser expects float values (thus decimal points would be allowed). One sample is partitioned in inputs and outputs in this succession without any other separations than the comma mentioned above.
 
 * Project TODO:
-** [ ] implement all WIP functions
-** [ ] implement proper back-propagation using gradient descent
+- [ ] implement all WIP functions
+- [ ] implement proper back-propagation using gradient descent
 
 * Disclaimer
 I am a hobbyist programmer who likes playing around with programming languages and other nerdy stuff in my free time, so do not expect either elegant or efficient code. Also there may be bugs and maybe some swear words here and there (due to their unique semantic appearance in contrast to programming language terminology I occasionally use them to jump between code passages via search function, if the code blocks are far apart from each other :>). ~Happy Hacking

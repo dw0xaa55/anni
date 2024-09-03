@@ -51,7 +51,7 @@ void  free_model(NeuralNetwork model);
 float randomize(float range_min, float range_max);
 float sigmoid(float x);
 void  feed_forward(NeuralNetwork* model);
-float mean_square_error(NeuralNetwork model, Trainingset trainingset);
+float mean_square_error(NeuralNetwork model, DataContainer inputs, DataContainer outputs);
 float finite_difference(NeuralNetwork model, float epsilon, float learningrate);
 
 #endif
@@ -245,10 +245,24 @@ void feed_forward(NeuralNetwork* model){
   }
 }
 
-float mean_square_error(NeuralNetwork model, Trainingset trainingset){
-  (void) model;
-  (void) trainingset;
-  return 0.0f;
+float mean_square_error(NeuralNetwork model, DataContainer input, DataContainer output){
+  size_t output_offset = model.neurons_size - model.topology[model.topology_size - 1];
+
+  float error = 0.0f;
+  for(size_t i = 0; i < input.samples; ++i){
+    // step 1: put inputs in network
+    for(size_t j = 0; j < input.stride; ++j)
+      model.neurons[j] = input.data[i*input.stride + j];
+    
+    // step 2: compute all neurons and thus outputs
+    feed_forward(&model);
+
+    // step 3: accumulate error for every output neuron and each trainingset
+    for(size_t j = 0; j < output.stride; ++j)
+      error += pow(model.neurons[output_offset + j] - output.data[i*output.stride + j], 2);
+  }
+  
+  return error/output.samples;
 }
 
 float finite_difference(NeuralNetwork model, float epsilon, float learningrate){
