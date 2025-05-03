@@ -1,7 +1,7 @@
-CC=gcc
 IN=anni.c
 OUT=anni
-CFLAGS=-Wall -Wextra -lm -g
+CC=gcc
+CFLAGS=-Wall -Wextra -O2 -lm -g
 
 out:
 	$(CC) $(IN) $(CFLAGS) -o $(OUT)
