@@ -44,8 +44,8 @@ Here everything is stored concerning the actual neural network and its architect
 #+BEGIN_SRC c
   typedef struct {
     // This structure represents the Neural Network
-    int    num_layers;    // number of layers (input + hidden + output)
-    int    *topology;     // array that specifies the number of neurons per layer
+    size_t num_layers;    // number of layers (input + hidden + output)
+    size_t *topology;     // array that specifies the number of neurons per layer
     double **neurons;     // array of neuron activations per layer
     double **biases;      // biases for neurons per layer (except input)
     double ***weights;    // weight matrices: weights[l][i][j] connects j-th neuron in (l-1)th layer to i-th neuron in layer l
@@ -62,21 +62,21 @@ Here is a list of all the functions used with a short discription of what they a
   double         sigmoidDerivative(double output);          // derivative of activation function used for training via back propagation
 
   NeuralNetwork* createNeuralNetwork(const size_t *topology,// instantiates the NeuralNetwork struct
-    			               size_t num_layers);
+  				   size_t num_layers);
 
   void           feedForward(NeuralNetwork *nn,             // uses the existing network to calculate the output
-    			       double *input);
+  			   double *input);
 
   void           printOutput(NeuralNetwork *nn);            // prints the output neurons
 
   void           backPropagation(NeuralNetwork *nn,         // back propagation utilizing gradient descent
-    			           double *target,
-    			           double learning_rate);
+  			       double *output
+  			       double learning_rate);
 
   void           train(NeuralNetwork *nn,                   // Trains the network for set number of epochs in a loop of feed forward and 
-    		         double *input,                       // back propagation. This functions needs to be looped through the training set
-  		     double *target,
-    		         double learning_rate);
+  		     double *input,                       // back propagation. This functions needs to be looped through the training set
+  		     double *output
+  		     double learning_rate);
 
   void           freeNeuralNetwork(NeuralNetwork *nn);      // frees allocated memory for neurons, biases and weights as well as the topology array
 #+END_SRC
