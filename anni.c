@@ -5,7 +5,7 @@ int main(){
   srand(time(NULL));
 
   // network topology
-  size_t topology[] = {2, 2, 1}; 
+  size_t topology[] = {2, 3, 2, 1}; 
 #define NUM_LAYERS (sizeof(topology) / sizeof(topology[0]))
 
   // initialize neural network.
