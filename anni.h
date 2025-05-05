@@ -2,11 +2,10 @@
  * Anni - Artificial Neural Network Intelligence
  * Author : C. Huffenbach
  * Date   : May 2025
- * Version: 4.2 
- * compiler string: gcc nn.c -lm -o nn
+ * Version: 4.3
  *
  * TODO:
- *   - [ ] print net
+ *   - [X] print net
  *   - [ ] save net to file
  *   - [ ] load net from file
  *   - [ ] load trainingdata from file
@@ -40,8 +39,9 @@ void           printOutput(NeuralNetwork *nn);
 void           backPropagation(NeuralNetwork *nn, double *output, double learning_rate);
 void           train(NeuralNetwork *nn, double *input, double *output, double learning_rate);
 void           freeNeuralNetwork(NeuralNetwork *nn);
-// TODO
 void           printNetwork(NeuralNetwork *nn);
+void           printTraining(NeuralNetwork *nn, size_t epoch);
+// TODO
 void           saveNetworkToFile(NeuralNetwork *nn, const char* filename);
 void           loadNetworkFromFile(NeuralNetwork *nn, const char* filename);
 #endif
@@ -202,17 +202,80 @@ freeNeuralNetwork(NeuralNetwork *nn){
 
 void
 printNetwork(NeuralNetwork *nn){
-  // TODO
+  printf("\033[36mArchitecture\n\033[0m");
+  printf("number of layers: %zu\n", nn->num_layers);
+  printf("topology        : ");
+  for(size_t i = 0; i < nn->num_layers; ++i){
+    printf("%zu", nn->topology[i]);
+    if(i < nn->num_layers-1)
+      printf(", ");
+  }
+  printf("\n\n");
+
+  printf("\033[36mNeurons:\033[0m\n");
+  printf("{\n");
+  for(size_t i = 0; i < nn->num_layers; ++i){
+    printf("\t{");
+    for(size_t j = 0; j < nn->topology[i]; ++j){
+      printf("%f ", nn->neurons[i][j]);
+      if(j < nn->topology[i]-1)
+	printf("\t");
+    }
+    printf("}\n");
+  }
+  printf("}\n\n");
+  printf("\033[36mBiases:\033[0m\n");
+  printf("{\n");
+  for(size_t i = 1; i < nn->num_layers; ++i){
+    printf("\t{");
+    for(size_t j = 0; j < nn->topology[i]; ++j){
+      printf("%f ", nn->biases[i][j]);
+      if(j < nn->topology[i]-1)
+	printf("\t");
+    }
+    printf("}\n");
+  }
+  printf("}\n\n");
+
+  printf("\033[36mWeights:\033[0m\n");
+  printf("{\n");
+  for(size_t i = 1; i < nn->num_layers; ++i){
+    size_t neurons_in_current = nn->topology[i];
+    size_t neurons_in_prev = nn->topology[i-1];
+    printf("\t{\n");
+    for(size_t j = 0; j < neurons_in_current; ++j){
+      printf("\t\t{");
+      for(size_t k = 0; k < neurons_in_prev; ++k){
+	printf("%f ", nn->weights[i][j][k]);
+	if(k < neurons_in_prev-1)
+	  printf("\t");
+      }
+      printf("}\n");
+    }
+    printf("\t}\n");
+  }
+  printf("}\n");
 }
 
 void
+printTraining(NeuralNetwork *nn, size_t epoch){
+  printf("\033[H");
+  printf("\033[33mEpochs\033[0m          : %zu\n", epoch);
+  printNetwork(nn);
+  printf("\n\n\033[36mError: \033[0m");
+}
+
+// TODO
+void
 saveNetworkToFile(NeuralNetwork *nn, const char* filename){
-  // TODO
+  (void) nn;
+  (void) filename;
 }  
 
 void
 loadNetworkFromFile(NeuralNetwork *nn, const char* filename){
-  // TODO
+  (void) nn;
+  (void) filename;
 }
 
 #endif

@@ -5,7 +5,7 @@ int main(){
   srand(time(NULL));
 
   // network topology
-  size_t topology[] = {2, 3, 2, 1}; 
+  size_t topology[] = {2, 3, 1}; 
 #define NUM_LAYERS (sizeof(topology) / sizeof(topology[0]))
 
   // initialize neural network.
@@ -27,14 +27,16 @@ int main(){
   double ANNI_learning_rate = 0.1;
   double ANNI_epochs        = 1000000;
 
-
-  for (int i = 0; i < ANNI_epochs; ++i){
+  printf("\033[2J");
+  for(size_t i = 0; i < ANNI_epochs; ++i){
     size_t sample = i % SAMPLE_AMOUNT; // change
     train(nn, input[sample], output[sample], ANNI_learning_rate);
+    printTraining(nn, i); // use for debugging only
   }
+  printf("\n");
 
   // network check
-  printf("trained network:\n");
+  printf("\033[33mtrained network:\033[0m\n");
   for (int i = 0; i < SAMPLE_AMOUNT; i++){
     feedForward(nn, input[i]);
     printf("Input: [%d, %d] -> Output: ", (int)input[i][0], (int)input[i][1]);

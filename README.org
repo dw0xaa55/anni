@@ -55,35 +55,35 @@ Here everything is stored concerning the actual neural network and its architect
 ** Functions
 Here is a list of all the functions used with a short discription of what they are doing:
 #+BEGIN_SRC c
-      #define RANDOM_WEIGHT() ((double)rand() / (double)RAND_MAX * 2.0 - 1.0) // macro for initializing weights randomly between -1.0 and 1.0.
+  #define RANDOM_WEIGHT() ((double)rand() / (double)RAND_MAX * 2.0 - 1.0) // macro for initializing weights randomly between -1.0 and 1.0.
 
-      double         sigmoid(double x);                         // activation function for feeding neurons forward in the network
+  double         sigmoid(double x);                         // activation function for feeding neurons forward in the network
 
-      double         sigmoidDerivative(double output);          // derivative of activation function used for training via back propagation
+  double         sigmoidDerivative(double output);          // derivative of activation function used for training via back propagation
 
-      NeuralNetwork* createNeuralNetwork(const size_t *topology,// instantiates the NeuralNetwork struct
-      				   size_t num_layers);
+  NeuralNetwork* createNeuralNetwork(const size_t *topology,// instantiates the NeuralNetwork struct
+  				   size_t num_layers);
 
-      void           feedForward(NeuralNetwork *nn,             // uses the existing network to calculate the output
-      			   double *input);
+  void           feedForward(NeuralNetwork *nn,             // uses the existing network to calculate the output
+  			   double *input);
 
-      void           printOutput(NeuralNetwork *nn);            // prints the output neurons
+  void           printOutput(NeuralNetwork *nn);            // prints the output neurons
 
-      void           backPropagation(NeuralNetwork *nn,         // back propagation utilizing gradient descent
-      			       double *output
-      			       double learning_rate);
+  void           backPropagation(NeuralNetwork *nn,         // back propagation utilizing gradient descent
+  			       double *output,
+  			       double learning_rate);
 
-      void           train(NeuralNetwork *nn,                   // Trains the network for set number of epochs in a loop of feed forward and 
-      		     double *input,                       // back propagation. This functions needs to be looped through the training set
-      		     double *output
-      		     double learning_rate);
+  void           train(NeuralNetwork *nn,                   // Trains the network for set number of epochs in a loop of feed forward and 
+  		     double *input,                       // back propagation. This functions needs to be looped through the training set
+  		     double *output,
+  		     double learning_rate);
 
-      void           freeNeuralNetwork(NeuralNetwork *nn);      // frees allocated memory for neurons, biases and weights as well as the topology array
-      void           printNetwork(NeuralNetwork *nn);           // debug function to see the values in the neural net
-      void           saveNetworkToFile(NeuralNetwork *nn,       // save the neural network to a binary file
-    				   const char* filename);
-      void           loadNetworkFromFile(NeuralNetwork *nn,     // load a neural network from a binary file
-  				       const char* filename);
+  void           freeNeuralNetwork(NeuralNetwork *nn);      // frees allocated memory for neurons, biases and weights as well as the topology array
+
+  void           printNetwork(NeuralNetwork *nn);           // prints the neurons, biases and weights representing the Neural Net for debug purposes
+
+  void           printTraining(NeuralNetwork *nn,           // prints the NeuralNet and the current epoch
+    			         size_t epoch);   
 #+END_SRC
 
 * Disclaimer
