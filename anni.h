@@ -37,6 +37,7 @@ NeuralNetwork* createNeuralNetwork(const size_t *topology, size_t num_layers);
 void           feedForward(NeuralNetwork *nn, double *input);
 void           printOutput(NeuralNetwork *nn);
 void           backPropagation(NeuralNetwork *nn, double *output, double learning_rate);
+double         meanSquareErrorDerivative(double predicted, double target, size_t n);
 void           train(NeuralNetwork *nn, double *input, double *output, double learning_rate);
 void           freeNeuralNetwork(NeuralNetwork *nn);
 void           printNetwork(NeuralNetwork *nn);
@@ -121,48 +122,54 @@ printOutput(NeuralNetwork *nn){
 
 // the backpropagation routine calculates the error gradients (deltas) for each neuron,
 // and then updates the weights and biases accordingly.
+double
+meanSquareErrorDerivative(double predicted, double target, size_t n){
+  return (predicted - target) / n;
+}
+
 void
 backPropagation(NeuralNetwork *nn, double *output, double learning_rate){
   size_t L = nn->num_layers;
     
-  // allocate an array of delta arrays (one per layer).
+  // Allocate an array of delta arrays (one per layer)
   double **deltas = malloc(L * sizeof(double*));
   for(size_t i = 0; i < L; ++i)
     deltas[i] = calloc(nn->topology[i], sizeof(double));
     
-  // calculate deltas for the output layer.
+  // Calculate deltas for the output layer using our mean square error derivative function.
   size_t output_layer = L - 1;
   for(size_t i = 0; i < nn->topology[output_layer]; ++i){
-    double out   = nn->neurons[output_layer][i];
-    double error = out - output[i];  // For a simple squared error loss.
-    deltas[output_layer][i] = error * sigmoidDerivative(out);
+    double out = nn->neurons[output_layer][i];
+    // Compute the MSE derivative for this output neuron.
+    double error_deriv = meanSquareErrorDerivative(out, output[i], nn->topology[output_layer]);
+    deltas[output_layer][i] = error_deriv * sigmoidDerivative(out);
   }
     
-  // propagate deltas backwards for the hidden layers.
-  for(size_t l = L - 2; l > 0; --l){
+  // Propagate deltas backwards for the hidden layers.
+  for(size_t l = L - 2; l > 0; --l) {
     for(size_t i = 0; i < nn->topology[l]; ++i){
       double sum = 0.0;
-      for(size_t j = 0; j < nn->topology[l+1]; ++j){
+      for(size_t j = 0; j < nn->topology[l+1]; ++j)
 	sum += nn->weights[l+1][j][i] * deltas[l+1][j];
-      }
-      double output = nn->neurons[l][i];
-      deltas[l][i] = sum * sigmoidDerivative(output);
+            
+      double out = nn->neurons[l][i];
+      deltas[l][i] = sum * sigmoidDerivative(out);
     }
   }
     
-  // update weights and biases using gradient descent.
+  // Update weights and biases using gradient descent.
   for(size_t l = 1; l < L; ++l){
     for(size_t i = 0; i < nn->topology[l]; ++i){
-      for(size_t j = 0; j < nn->topology[l-1]; ++j){
+      for(size_t j = 0; j < nn->topology[l-1]; ++j)
 	nn->weights[l][i][j] -= learning_rate * deltas[l][i] * nn->neurons[l-1][j];
-      }
-      // update bias.
+            
+      // Update bias.
       nn->biases[l][i] -= learning_rate * deltas[l][i];
     }
   }
     
-  // clean up delta arrays.
-  for(size_t i = 0; i < L; ++i)
+  // Clean up delta arrays.
+  for (size_t i = 0; i < L; ++i)
     free(deltas[i]);
   free(deltas);
 }
@@ -202,6 +209,7 @@ freeNeuralNetwork(NeuralNetwork *nn){
 
 void
 printNetwork(NeuralNetwork *nn){
+  // print architecture
   printf("\033[36mArchitecture\n\033[0m");
   printf("number of layers: %zu\n", nn->num_layers);
   printf("topology        : ");
@@ -212,10 +220,11 @@ printNetwork(NeuralNetwork *nn){
   }
   printf("\n\n");
 
+  // print neurons
   printf("\033[36mNeurons:\033[0m\n");
-  printf("{\n");
+  printf("{ \n");
   for(size_t i = 0; i < nn->num_layers; ++i){
-    printf("\t{");
+    printf("\t{ ");
     for(size_t j = 0; j < nn->topology[i]; ++j){
       printf("%f ", nn->neurons[i][j]);
       if(j < nn->topology[i]-1)
@@ -224,10 +233,12 @@ printNetwork(NeuralNetwork *nn){
     printf("}\n");
   }
   printf("}\n\n");
+
+  // print biases
   printf("\033[36mBiases:\033[0m\n");
-  printf("{\n");
+  printf("{ \n");
   for(size_t i = 1; i < nn->num_layers; ++i){
-    printf("\t{");
+    printf("\t{ ");
     for(size_t j = 0; j < nn->topology[i]; ++j){
       printf("%f ", nn->biases[i][j]);
       if(j < nn->topology[i]-1)
@@ -237,14 +248,15 @@ printNetwork(NeuralNetwork *nn){
   }
   printf("}\n\n");
 
+  // print weights
   printf("\033[36mWeights:\033[0m\n");
-  printf("{\n");
+  printf("{ \n");
   for(size_t i = 1; i < nn->num_layers; ++i){
     size_t neurons_in_current = nn->topology[i];
     size_t neurons_in_prev = nn->topology[i-1];
-    printf("\t{\n");
+    printf("\t{ \n");
     for(size_t j = 0; j < neurons_in_current; ++j){
-      printf("\t\t{");
+      printf("\t\t{ ");
       for(size_t k = 0; k < neurons_in_prev; ++k){
 	printf("%f ", nn->weights[i][j][k]);
 	if(k < neurons_in_prev-1)
@@ -254,7 +266,7 @@ printNetwork(NeuralNetwork *nn){
     }
     printf("\t}\n");
   }
-  printf("}\n");
+  printf("}\n\n");
 }
 
 void
@@ -262,7 +274,6 @@ printTraining(NeuralNetwork *nn, size_t epoch){
   printf("\033[H");
   printf("\033[33mEpochs\033[0m          : %zu\n", epoch);
   printNetwork(nn);
-  printf("\n\n\033[36mError: \033[0m");
 }
 
 // TODO
