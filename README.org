@@ -77,7 +77,7 @@ Here is a list of all the functions used with a short discription of what they a
   			       double *output,
   			       double learning_rate);
 
-  void           train(NeuralNetwork *nn,                    // Trains the network for set number of epochs in a loop of feed forward and 
+  void           train(NeuralNetwork *nn,                    // trains the network for set number of epochs in a loop of feed forward and 
   		     double *input,                        // back propagation. This functions needs to be looped through the training set
   		     double *output,
   		     double learning_rate);
